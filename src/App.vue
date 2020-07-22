@@ -9,21 +9,28 @@ export default {
       searchForm: {
         class: '',
         sex: '',
-        schoolNumber: ''
+        schoolNumber: '',
+        country: 2
       },
       tableData: [{
         sex: '女',
         name: '小美',
         schoolNumber: '123232'
+      }, {
+        sex: '男',
+        name: '王大锤',
+        schoolNumber: '9278781'
       }],
       pages: {
         total: 1,
         currentPage: 1,
         pageSize: 30
-      }
+      },
+      countryOptions: []
     }
   },
   mounted () {
+    console.log(this)
   },
   methods: {
     transToNode: function (setting, parentNode) {

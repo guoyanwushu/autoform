@@ -26,6 +26,12 @@ var layOut = [{
       valueField: 'searchForm.class'
     }, {
       type: 'component',
+      comp_type: 'formItem_select',
+      url: '/tcs/sdsjido',
+      valueField: 'searchForm.country',
+      options: 'countryOptions'
+    }, {
+      type: 'component',
       comp_type: 'button_search',
       handlerType: 'function_table_search',
       handlerName: 'search',
@@ -72,7 +78,10 @@ var layOut = [{
       prop: 'sex'
     }, {
       label: '学号',
-      prop: 'schoolNumber'
+      prop: 'schoolNumber',
+      formatter: function (row) {
+        return '学号' + row.schoolNumber
+      }
     }]
   }]
 }, {
