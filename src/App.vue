@@ -30,14 +30,38 @@ export default {
     }
   },
   mounted () {
-    console.log(this)
+    this.domHtml = document.createElement('div')
+    this.domHtml.setAttribute('id', 'app')
   },
   methods: {
+    // 根据元素tag名, 把组件名提取出来，比如生成的vNode的tag名是这种vue-component-42-ElFormItem
+    getTagName: function (orignName) {
+      var _nameArr = orignName.split('-').slice(-1)[0].split('')
+      var _targetName = []
+      _nameArr.forEach(function (item, index) {
+        if (item.toLowerCase() !== item && index !== 0) {
+          _targetName.push('-' + item.toLowerCase())
+        } else {
+          _targetName.push(item.toLowerCase())
+        }
+      })
+      return _targetName.join('')
+    },
     transToNode: function (setting, parentNode) {
       // 生成vNdoe树， 然后把vNode树一编译，perfect
       var self = this
       if (setting.type === 'container') {
         const node = containers[setting.name](self)
+        var _hnode = document.createElement('div')
+        if (node.data.style) {
+          for (var key in node.data.style) {
+            _hnode.style.setProperty(key, node.data.style[key])
+          }
+        }
+        if (parentNode.matchDom) {
+          parentNode.matchDom.append(_hnode)
+        }
+        node.matchDom = _hnode
         parentNode.children ? parentNode.children.push(node) : parentNode.children = [node]
         if (setting.children.length) {
           setting.children.map(function (item) {
@@ -48,6 +72,22 @@ export default {
         // 分两种情况, 一种父组件是普通的标签元素，子元素是存在children里面。一种父组件是组件，子元素是存在componentOptions.children
         // 里面
         const node = comps[setting.comp_type](setting, self)
+        var _node = document.createElement(self.getTagName(node.tag))
+        var props = node.data.props
+        for (var propName in props) {
+          if (typeof props[propName] === 'object') {
+            _node.setAttribute(':' + propName, setting[propName])
+          } else if (typeof props[propName] === 'number' || typeof props[propName] === 'boolean') {
+            _node.setAttribute(':' + propName, props[propName])
+          } else {
+            _node.setAttribute(propName, props[propName])
+          }
+          // 问题，prop也分两种，一种是静态的，一种是动态的.在生成模板代码的时候，怎么去区分这两种呢?
+        }
+        if (parentNode.matchDom) {
+          parentNode.matchDom.append(_node)
+        }
+        node.matchDom = _node
         if (!parentNode.componentOptions) {
           // 父节点是元素节点
           parentNode.children = parentNode.children || []
@@ -71,9 +111,11 @@ export default {
         id: 'app'
       }
     })
+    root.matchDom = document.createElement('div')
     settings.map(function (item) {
       self.transToNode(item, root)
     })
+    console.log(root.matchDom)
     return root
   }
 }

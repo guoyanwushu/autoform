@@ -77,7 +77,6 @@ var comps = {
     if (options.url) {
       // 如果是url, 那么要在created里面去查询对应的下拉列表数据
       instance.$options.mounted.push(function () {
-        console.log('瞅瞅啥啊')
         setTimeout(function () {
           instance[options.options] = [{
             id: 1,
@@ -174,7 +173,7 @@ var comps = {
   table: function (options, instance) {
     return instance.$createElement(Table, {
       props: {
-        data: instance[options.tableData],
+        data: instance[options.data],
         height: '100%',
         size: 'small',
         stripe: true,

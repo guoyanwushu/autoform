@@ -69,7 +69,7 @@ var layOut = [{
   children: [{
     type: 'component',
     comp_type: 'table',
-    tableData: 'tableData',
+    data: 'tableData',
     fields: [{
       label: '姓名',
       prop: 'name'
