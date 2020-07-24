@@ -62,6 +62,16 @@ var layOut = [{
     handlerType: 'function_batch_remove',
     handlerName: '_batch_remove',
     text: '批量移除'
+  }, {
+    type: 'component',
+    comp_type: 'button_normal',
+    clickHandler: 'addComponent',
+    text: '动态添加组件'
+  }, {
+    type: 'component',
+    comp_type: 'button_normal',
+    clickHandler: 'removeComponent',
+    text: '动态删除组件'
   }]
 }, {
   type: 'container',

@@ -1,9 +1,11 @@
 <script>
 import { containers, comps } from './util/map.js'
+import SetWrapper from './components/SetWrapper'
 import settings from './util/trans1'
 export default {
   data () {
     return {
+      isEdit: true,
       pageContainer: '',
       name: '',
       searchForm: {
@@ -29,11 +31,24 @@ export default {
       countryOptions: []
     }
   },
+  beforeCreate () {
+    this.nodeArrForAdding = []
+  },
   mounted () {
     this.domHtml = document.createElement('div')
     this.domHtml.setAttribute('id', 'app')
   },
   methods: {
+    addComponent: function () {
+      // 测试一波动态添加组件
+      console.log(this._render())
+      this.nodeArrForAdding.push(this.$createElement('p', '这是我新加的组件呢，铁子们'))
+      this._update(this._render(), false)
+    },
+    removeComponent: function () {
+      this.nodeArrForAdding = []
+      this._update(this._render(), false)
+    },
     // 根据元素tag名, 把组件名提取出来，比如生成的vNode的tag名是这种vue-component-42-ElFormItem
     getTagName: function (orignName) {
       var _nameArr = orignName.split('-').slice(-1)[0].split('')
@@ -51,7 +66,8 @@ export default {
       // 生成vNdoe树， 然后把vNode树一编译，perfect
       var self = this
       if (setting.type === 'container') {
-        const node = containers[setting.name](self)
+        let node = containers[setting.name](self)
+        const realnode = node
         var _hnode = document.createElement('div')
         if (node.data.style) {
           for (var key in node.data.style) {
@@ -62,16 +78,25 @@ export default {
           parentNode.matchDom.append(_hnode)
         }
         node.matchDom = _hnode
+        if (self.isEdit) {
+          node = self.$createElement(SetWrapper, {
+            style: node.data.style
+          }, [node])
+        }
         parentNode.children ? parentNode.children.push(node) : parentNode.children = [node]
         if (setting.children.length) {
           setting.children.map(function (item) {
-            self.transToNode(item, node)
+            self.transToNode(item, realnode)
           })
         }
       } else {
         // 分两种情况, 一种父组件是普通的标签元素，子元素是存在children里面。一种父组件是组件，子元素是存在componentOptions.children
         // 里面
-        const node = comps[setting.comp_type](setting, self)
+        let node = comps[setting.comp_type](setting, self)
+        if (setting.comp_type === 'button_normal') {
+          // console.log(node)
+        }
+        const realnode = node
         var _node = document.createElement(self.getTagName(node.tag))
         var props = node.data.props
         for (var propName in props) {
@@ -88,6 +113,9 @@ export default {
           parentNode.matchDom.append(_node)
         }
         node.matchDom = _node
+        if (self.isEdit) {
+          node = self.$createElement(SetWrapper, [node])
+        }
         if (!parentNode.componentOptions) {
           // 父节点是元素节点
           parentNode.children = parentNode.children || []
@@ -98,7 +126,7 @@ export default {
         }
         if (setting.children && setting.children.length) {
           setting.children.map(function (item) {
-            self.transToNode(item, node)
+            self.transToNode(item, realnode)
           })
         }
       }
@@ -115,7 +143,13 @@ export default {
     settings.map(function (item) {
       self.transToNode(item, root)
     })
-    console.log(root.matchDom)
+    this.nodeArrForAdding.map(function (item) {
+      if (item && !item.added) {
+        root.children.push(item)
+        item.added = true
+      }
+    })
+    // console.log(root.matchDom)
     return root
   }
 }

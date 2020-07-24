@@ -170,6 +170,24 @@ var comps = {
       }
     }, options.text)
   },
+  button_normal: function (options, instance) {
+    return instance.$createElement(Button, {
+      props: {
+        size: 'small'
+      },
+      compDesc: '常规按钮',
+      config: {
+        buttonName: {
+          pointer: options.text,
+          inputType: 'input',
+          validator: null
+        }
+      },
+      on: {
+        click: instance[options.clickHandler]
+      }
+    }, options.text)
+  },
   table: function (options, instance) {
     return instance.$createElement(Table, {
       props: {
@@ -201,7 +219,7 @@ var comps = {
     })
   }
 }
-
+// set 和 get的目的都是为了从‘searchForm.name’这种字段取值或者赋值
 function getDataByKey (obj, keyStr) {
   var keyArr = keyStr.split('.')
   var value = obj
